@@ -7,7 +7,7 @@ const {
     joinVoiceChannel,
     VoiceConnectionStatus
 } = require('@discordjs/voice');
-const ytdl = require('@distube/ytdl-core');
+const playdl = require('play-dl');
 const ytSearch = require('youtube-search-api');
 const config = require('./config');
 
@@ -40,15 +40,15 @@ async function searchYouTube(query) {
     }
 }
 
-function buildStream(url) {
-    return ytdl(url, {
-        filter: 'audioonly',
-        quality: 'highestaudio',
-        highWaterMark: 1 << 25
+async function buildStream(url) {
+    const stream = await playdl.stream(url, {
+        quality: 2,
+        discordPlayerCompatibility: true
     });
+    return stream;
 }
 
-function playNext() {
+async function playNext() {
     if (state.queue.length === 0) {
         state.current = null;
         state.playing = false;
@@ -59,15 +59,21 @@ function playNext() {
     state.current = song;
     state.playing = true;
 
-    const stream = buildStream(song.url);
-    const resource = createAudioResource(stream, {
-        inputType: StreamType.Arbitrary,
-        inlineVolume: true
-    });
-    resource.volume.setVolume(state.volume / 100);
-    state.player.play(resource);
-
-    messageSender('nowPlaying', { title: song.title });
+    try {
+        const streamData = await buildStream(song.url);
+        const resource = createAudioResource(streamData.stream, {
+            inputType: streamData.type,
+            inlineVolume: true
+        });
+        resource.volume.setVolume(state.volume / 100);
+        state.player.play(resource);
+        messageSender('nowPlaying', { title: song.title });
+    } catch (err) {
+        console.error('playNext error:', err);
+        state.playing = false;
+        state.current = null;
+        playNext();
+    }
 }
 
 state.player.on(AudioPlayerStatus.Idle, () => {
@@ -99,7 +105,7 @@ async function joinChannel(channel) {
     });
 
     try {
-        await entersState(state.connection, VoiceConnectionStatus.Ready, 20000);
+        await entersState(state.connection, VoiceConnectionStatus.Ready, 30000);
         state.connection.subscribe(state.player);
     } catch (e) {
         console.error('Join failed:', e);
