@@ -7,7 +7,7 @@ const {
     joinVoiceChannel,
     VoiceConnectionStatus
 } = require('@discordjs/voice');
-const ytdl = require('ytdl-core');
+const ytdl = require('@distube/ytdl-core');
 const ytSearch = require('youtube-search-api');
 const config = require('./config');
 
