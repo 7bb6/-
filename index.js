@@ -16,10 +16,9 @@ require('libsodium-wrappers').ready.then(async () => {
             GatewayIntentBits.Guilds,
             GatewayIntentBits.GuildMessages,
             GatewayIntentBits.MessageContent,
-            GatewayIntentBits.GuildVoiceStates,
-            GatewayIntentBits.GuildMembers
+            GatewayIntentBits.GuildVoiceStates
         ],
-        partials: [Partials.Channel, Partials.Message, Partials.GuildMember]
+        partials: [Partials.Channel]
     });
 
     let notifyChannel = null;
@@ -41,11 +40,7 @@ require('libsodium-wrappers').ready.then(async () => {
             color: 0x5865F2,
             image: { url: config.embedImage }
         };
-
-        if (extraFooter) {
-            embed.footer = { text: config.signature };
-        }
-
+        if (extraFooter) embed.footer = { text: config.signature };
         return embed;
     }
 
@@ -63,7 +58,7 @@ require('libsodium-wrappers').ready.then(async () => {
         return notifyChannel.send(content).catch(() => {});
     }
 
-    client.on('ready', () => {
+    client.on('clientReady', () => {
         console.log(`Logged in as ${client.user.tag}`);
     });
 
@@ -91,7 +86,6 @@ require('libsodium-wrappers').ready.then(async () => {
             const targetChannel = guild.channels.cache.get(config.voiceChannelId);
             if (!targetChannel) return;
 
-            const st = player.getState();
             const me = guild.members.me;
             const myChannel = me?.voice?.channel;
 
