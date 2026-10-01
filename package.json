@@ -1,0 +1,19 @@
+{
+  "name": "music-bot",
+  "version": "1.0.0",
+  "description": "Discord Bot for playing music in voice channel",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.3",
+    "@discordjs/voice": "^0.17.0",
+    "ytdl-core": "^4.11.5",
+    "youtube-search-api": "^1.2.0",
+    "libsodium-wrappers": "^0.7.13",
+    "ffmpeg-static": "^5.2.0",
+    "opusscript": "^0.0.8",
+    "dotenv": "^16.4.5"
+  }
+}
